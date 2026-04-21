@@ -1,54 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>글 목록</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>templates/post/list.html</title>
 </head>
 <body>
-
-<h1>글 목록</h1>
-
-<form action="/post/delete" method="post">
-
-    <button type="submit">선택 삭제</button>
-
-    <table border="1">
-        <tr>
-            <th>
-                <input type="checkbox" id="checkAll">
-            </th>
-            <th>번호</th>
-            <th>작성자</th>
-            <th>제목</th>
-            <th>작성일</th>
-        </tr>
-
-        {% for post in posts %}
-        <tr>
-            <td>
-                <input type="checkbox" name="post_ids" value="{{ post.num }}">
-            </td>
-            <td>{{ post.num }}</td>
-            <td>{{ post.writer }}</td>
-            <td>{{ post.title }}</td>
-            <td>{{ post.created_at }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-</form>
-
-<br>
-<a href="/post/new">글 작성</a>
-
-<script>
-    // 전체 선택 기능
-    const checkAll = document.getElementById("checkAll");
-
-    checkAll.addEventListener("change", function() {
-        const checkboxes = document.querySelectorAll("input[name='post_ids']");
-        checkboxes.forEach(cb => cb.checked = checkAll.checked);
-    });
-</script>
-
+    <div class="container">
+        <a href="/post/new">새글 작성</a>
+        <h3>글 목록 입니다</h3>
+        <table border="1" cellpadding="8" cellspacing="0">
+            <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>작성자</th>
+                    <th>제목</th>
+                    <th>내용</th>
+                    <th>작성일</th>
+                    <th>수정</th>
+                    <th>삭제</th>
+                </tr>
+            </thead>
+            <tbody>          
+            {% for post in posts %} <!-- posts 리스트를 순회하면서 각 post에 대해 아래 코드를 반복함 -->
+                <tr>
+                    <td>{{ post.num }}</td>       <!-- post의 num(번호) 필드 값을 출력 -->
+                    <td>{{ post.writer }}</td>    <!-- post의 writer(작성자) 필드 값을 출력 -->
+                    <td>{{ post.title }}</td>     <!-- post의 title(제목) 필드 값을 출력 -->
+                    <td>{{ post.content }}</td>   <!-- post의 content(내용) 필드 값을 출력 -->
+                    <td>{{ post.created_at }}</td><!-- post의 created_at(작성일) 필드 값을 출력 -->
+                    <td>
+                        <a href="/post/edit/{{ post.num }}">수정</a>
+                    </td>
+                    <td>
+                        <a href="/post/delete/{{ post.num }}">삭제</a>
+                    </td>
+                </tr>
+            {% endfor %} <!-- for 반복문 종료 -->
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>

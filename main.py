@@ -59,7 +59,7 @@ def postNewForm(request: Request):
 
 
 @app.post("/post/new")
-def postNew(writer: str = Form(...), title: str = Form(...), content: str = Form(...),
+def postNew(request: Request, writer: str = Form(...), title: str = Form(...), content: str = Form(...),
             db: Session = Depends(get_db)):
     # DB 에 저장할 sql 문  준비
     query = text("""
@@ -67,18 +67,46 @@ def postNew(writer: str = Form(...), title: str = Form(...), content: str = Form
         (writer, title, content)
         VALUES(:writer, :title, :content)
     """)
-    # query문을 실행하면서 같이 전달한 dict의 키값과 :writer, :title, :content동일한 위치에 값이 바인딩되어서 실행된다.
+    # query 문을 실행하면서 같이 전달한 dict 의 키값과  :writer , :title, :content 동일한 위치에 값이 바인딩되어서 실행된다.
     db.execute(query, {"writer":writer, "title":title, "content":content})
     db.commit()
 
 
     # 특정 경로로 요청을 다시 하도록 리다일렉트 응답을 준다.
-    return RedirectResponse("/post", status_code=302)
+    return templates.TemplateResponse(
+        request=request,
+        name="post/alert.html",
+        context={
+            "msg":"글 정보를 추가 했습니다!",
+            "url":"/post"
+        }
+    )
 
-@app.get("/post/delete/{num}") # {num}경로변수 선언(path valriable)
+
+@app.get("/post/delete/{num}") # {num} 경로변수 선언 (path variable)
 def delete(num: int, db: Session = Depends(get_db)): # 경로 변수의 이름과 함수의 매개변수의 이름을 일치시킨다
-    # num에는 삭제할 글의 번호가 들어있다.
+    # num 에는 삭제할 글의 번호가 들어 있다.
     query = text("DELETE FROM post WHERE num=:num")
     db.execute(query, {"num":num})
     db.commit()
+    # 클라이언트가 /post 로 다시 요청하라고 강요하기
     return RedirectResponse("/post", status_code=302)
+
+
+@app.get("/post/edit/{num}")
+def edit(num: int, request: Request, db: Session = Depends(get_db)):
+    # 수정할 글정보를 읽어오기 위한 query 작성
+    query = text("""
+        SELECT num, writer, title, content, created_at
+        FROM post
+        WHERE num=:num
+    """)
+    # PK 를 이용해서 select 하는 것이기 때문에 row 는 1개다 따라서 .fetchone() 함수를 호출한다.
+    row = db.execute(query, {"num":num}).fetchone()
+    return templates.TemplateResponse(
+        request=request,
+        name="post/edit.html",
+        context={
+            "post":row
+        }
+    )
