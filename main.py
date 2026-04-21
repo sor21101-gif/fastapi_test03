@@ -6,11 +6,11 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 
-app = FastAPI()
-templates = Jinja2Templates(directory="templates")
+app = FastAPI() # fastapi로 실행
+templates = Jinja2Templates(directory="templates") # template는 jinja2 이용
 
 
-@app.get("/", response_class=HTMLResponse)
+@app.get("/", response_class=HTMLResponse) # 시작페이지 구성
 def index(request: Request):
     return templates.TemplateResponse(
         request=request,
