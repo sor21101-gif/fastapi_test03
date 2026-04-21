@@ -1,50 +1,54 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>templates/post/list.html</title>
-    <style>
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: center;
-        }
-        th {
-            background-color: #f2f2f2;
-        }
-    </style>
+    <title>글 목록</title>
 </head>
 <body>
-    <div class="container">
-        <a href="/post/new">새 글 작성</a>
-        <h3>글 목록입니다</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>번호</th>
-                    <th>작성자</th>
-                    <th>제목</th>
-                    <th>내용</th>
-                    <th>작성일</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for post in posts %}
-                <tr>
-                    <td>{{ post.num }}</td>
-                    <td>{{ post.writer }}</td>
-                    <td>{{ post.title }}</td>
-                    <td>{{ post.content }}</td>
-                    <td>{{ post.created_at }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+
+<h1>글 목록</h1>
+
+<form action="/post/delete" method="post">
+
+    <button type="submit">선택 삭제</button>
+
+    <table border="1">
+        <tr>
+            <th>
+                <input type="checkbox" id="checkAll">
+            </th>
+            <th>번호</th>
+            <th>작성자</th>
+            <th>제목</th>
+            <th>작성일</th>
+        </tr>
+
+        {% for post in posts %}
+        <tr>
+            <td>
+                <input type="checkbox" name="post_ids" value="{{ post.num }}">
+            </td>
+            <td>{{ post.num }}</td>
+            <td>{{ post.writer }}</td>
+            <td>{{ post.title }}</td>
+            <td>{{ post.created_at }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</form>
+
+<br>
+<a href="/post/new">글 작성</a>
+
+<script>
+    // 전체 선택 기능
+    const checkAll = document.getElementById("checkAll");
+
+    checkAll.addEventListener("change", function() {
+        const checkboxes = document.querySelectorAll("input[name='post_ids']");
+        checkboxes.forEach(cb => cb.checked = checkAll.checked);
+    });
+</script>
+
 </body>
 </html>

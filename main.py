@@ -67,6 +67,7 @@ def postNew(writer: str = Form(...), title: str = Form(...), content: str = Form
         (writer, title, content)
         VALUES(:writer, :title, :content)
     """)
+    # query문을 실행하면서 같이 전달한 dict의 키값과 :writer, :title, :content동일한 위치에 값이 바인딩되어서 실행된다.
     db.execute(query, {"writer":writer, "title":title, "content":content})
     db.commit()
 
@@ -74,4 +75,10 @@ def postNew(writer: str = Form(...), title: str = Form(...), content: str = Form
     # 특정 경로로 요청을 다시 하도록 리다일렉트 응답을 준다.
     return RedirectResponse("/post", status_code=302)
 
-
+@app.get("/post/delete/{num}") # {num}경로변수 선언(path valriable)
+def delete(num: int, db: Session = Depends(get_db)): # 경로 변수의 이름과 함수의 매개변수의 이름을 일치시킨다
+    # num에는 삭제할 글의 번호가 들어있다.
+    query = text("DELETE FROM post WHERE num=:num")
+    db.execute(query, {"num":num})
+    db.commit()
+    return RedirectResponse("/post", status_code=302)
